@@ -1,0 +1,12 @@
+[build]
+  command = "pip install -r requirements.txt"
+  functions = "netlify/functions"
+  publish = "."
+
+[functions]
+  python_runtime = "python3.9"
+
+[[redirects]]
+  from = "/api/v1/hackrx/run"
+  to = "/.netlify/functions/hackrx"
+  status = 200
