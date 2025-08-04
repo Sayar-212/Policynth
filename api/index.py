@@ -2,14 +2,11 @@ from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
-import sys
+from pydantic import BaseModel
+from typing import List
+import requests
+import json
 import os
-
-# Add parent directory to path for imports
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from services.query_engine import QueryEngine
-from models.schemas import QueryRequest, QueryResponse
 
 app = FastAPI(title="Policynth API", version="1.0.0")
 
@@ -21,6 +18,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Models
+class QueryRequest(BaseModel):
+    documents: str
+    questions: List[str]
+
+class QueryResponse(BaseModel):
+    answers: List[str]
 
 # Authentication
 security = HTTPBearer()
@@ -35,14 +40,16 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
         )
     return credentials.credentials
 
-# Initialize query engine
-query_engine = QueryEngine()
-
 @app.post("/api/v1/hackrx/run", response_model=QueryResponse)
 async def run_query(request: QueryRequest, token: str = Depends(verify_token)):
     try:
-        response = await query_engine.process_query(request)
-        return response
+        # Simple mock response for now - replace with actual processing
+        answers = []
+        for question in request.questions:
+            answer = f"Mock answer for: {question}"
+            answers.append(answer)
+        
+        return QueryResponse(answers=answers)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
