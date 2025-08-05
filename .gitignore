@@ -44,3 +44,5 @@ faiss_metadata.json
 
 # Logs
 *.log
+# Local Netlify folder
+.netlify
